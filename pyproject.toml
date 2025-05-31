@@ -6,5 +6,12 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = []
 
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+package = true
+
 [project.scripts]
 cai = "cai.cli:main"
