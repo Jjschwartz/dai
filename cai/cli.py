@@ -53,36 +53,70 @@ Keep your response concise and practical."""
 def run_command_with_ai_analysis(command_args):
     """Run a command and provide AI analysis if it fails."""
     try:
-        # Execute the command
-        result = subprocess.run(
+        # Execute the command with streaming output
+        process = subprocess.Popen(
             command_args,
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True,
-            check=False
+            bufsize=1,
+            universal_newlines=True
         )
         
-        # If command succeeded, just show output
-        if result.returncode == 0:
-            if result.stdout:
-                print(result.stdout, end='')
-            if result.stderr:
-                print(result.stderr, end='', file=sys.stderr)
-            return result.returncode
+        # Capture output for AI analysis while streaming
+        stdout_lines = []
+        stderr_lines = []
         
-        # Command failed - show error and provide AI analysis
-        print(f"Command failed with exit code {result.returncode}")
-        if result.stdout:
-            print("STDOUT:")
-            print(result.stdout)
-        if result.stderr:
-            print("STDERR:")
-            print(result.stderr)
+        # Stream output in real-time
+        import select
+
+        # Use polling to read from both stdout and stderr
+        while process.poll() is None:
+            # Check if there's data to read
+            ready, _, _ = select.select(
+                [process.stdout, process.stderr], [], [], 0.1
+            )
+
+            for stream in ready:
+                if stream == process.stdout:
+                    line = stream.readline()
+                    if line:
+                        print(line, end="")
+                        stdout_lines.append(line)
+                elif stream == process.stderr:
+                    line = stream.readline()
+                    if line:
+                        print(line, end="", file=sys.stderr)
+                        stderr_lines.append(line)
         
+        # Read any remaining output
+        remaining_stdout = process.stdout.read()
+        remaining_stderr = process.stderr.read()
+        
+        if remaining_stdout:
+            print(remaining_stdout, end="")
+            stdout_lines.append(remaining_stdout)
+        if remaining_stderr:
+            print(remaining_stderr, end="", file=sys.stderr)
+            stderr_lines.append(remaining_stderr)
+        
+        # Get the exit code
+        exit_code = process.returncode
+        
+        # If command succeeded, we're done
+        if exit_code == 0:
+            return exit_code
+        
+        # Command failed - provide AI analysis
+        stdout_text = "".join(stdout_lines)
+        stderr_text = "".join(stderr_lines)
+        
+        print(f"\nCommand failed with exit code {exit_code}")
         print("\n🤖 AI Analysis:")
-        analysis = analyze_error_with_claude(command_args, result.stdout, result.stderr, result.returncode)
+        analysis = analyze_error_with_claude(command_args, stdout_text, stderr_text, exit_code)
         print(analysis)
         
-        return result.returncode
+        return exit_code
         
     except FileNotFoundError:
         print(f"Error: Command '{command_args[0]}' not found")
