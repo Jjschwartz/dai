@@ -1,7 +1,10 @@
 [project]
 name = "cai"
 version = "0.1.0"
-description = "Add your description here"
+description = "Command AI - A CLI tool that provides AI-powered error analysis for terminal commands"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = []
+
+[project.scripts]
+cai = "cai.cli:main"
