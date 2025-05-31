@@ -5,6 +5,7 @@ Command AI (cai) - CLI tool for AI-powered error analysis
 import argparse
 import os
 import select
+import shlex
 import subprocess
 import sys
 
@@ -61,12 +62,13 @@ Format your response using markdown with **bold** for key points and *italics* f
         return f"❌ Error calling Claude API: {e}"
 
 
-def run_command_with_ai_analysis(command_args):
+def run_command_with_ai_analysis(command_string):
     """Run a command and provide AI analysis if it fails."""
     try:
-        # Execute the command with streaming output
+        # Execute the command through shell to handle pipes, redirects, and complex syntax
         process = subprocess.Popen(
-            command_args,
+            command_string,
+            shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
@@ -121,10 +123,10 @@ def run_command_with_ai_analysis(command_args):
 
         print(f"\nCommand failed with exit code {exit_code}")
         print("\n🤖 AI Analysis:")
-        analyze_error_with_claude(command_args, stdout_text, stderr_text, exit_code)
+        analyze_error_with_claude([command_string], stdout_text, stderr_text, exit_code)
         return exit_code
     except FileNotFoundError:
-        print(f"Error: Command '{command_args[0]}' not found")
+        print(f"Error: Command not found")
         return 127
     except Exception as e:
         print(f"Error executing command: {e}")
@@ -137,7 +139,7 @@ def main():
         description="Command AI - Run commands with AI-powered error analysis",
         prog="cai",
     )
-    parser.add_argument("command", nargs="+", help="Command and arguments to execute")
+    parser.add_argument("command", nargs="*", help="Command and arguments to execute")
 
     # If no arguments provided, show help
     if len(sys.argv) == 1:
@@ -145,9 +147,17 @@ def main():
         return 0
 
     args = parser.parse_args()
+    
+    # Join all arguments back into a single command string to preserve quotes, pipes, etc.
+    command_string = " ".join(args.command)
+    
+    # If the command string is empty after joining, show help
+    if not command_string.strip():
+        parser.print_help()
+        return 0
 
     # Run the command with AI analysis
-    return run_command_with_ai_analysis(args.command)
+    return run_command_with_ai_analysis(command_string)
 
 
 if __name__ == "__main__":
