@@ -18,4 +18,12 @@ Simply prefix any command with `cai` to get AI-powered error analysis:
 cai your-normal-command
 ```
 
-When the command fails, cai will capture the error and provide intelligent debugging suggestions.
+When the command fails, cai will capture the error and provide intelligent debugging suggestions using Claude.
+
+## Setup
+
+You'll need to set your Anthropic API key as an environment variable:
+
+```bash
+export ANTHROPIC_API_KEY='your-api-key-here'
+```

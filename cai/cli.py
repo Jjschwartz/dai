@@ -5,6 +5,49 @@ Command AI (cai) - CLI tool for AI-powered error analysis
 import sys
 import subprocess
 import argparse
+import os
+from anthropic import Anthropic
+
+
+def analyze_error_with_claude(command, stdout, stderr, exit_code):
+    """Use Claude to analyze the command error and provide suggestions."""
+    try:
+        # Check for API key
+        api_key = os.getenv('ANTHROPIC_API_KEY')
+        if not api_key:
+            return "❌ No ANTHROPIC_API_KEY environment variable found. Please set it to use AI analysis."
+        
+        client = Anthropic(api_key=api_key)
+        
+        prompt = f"""I ran this command and it failed:
+Command: {' '.join(command)}
+Exit code: {exit_code}
+
+STDOUT:
+{stdout or '(empty)'}
+
+STDERR:
+{stderr or '(empty)'}
+
+Please analyze this error and provide:
+1. A brief explanation of what went wrong
+2. Specific suggestions to fix the issue
+3. Any relevant context or common causes
+
+Keep your response concise and practical."""
+
+        response = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=1000,
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
+        
+        return response.content[0].text
+        
+    except Exception as e:
+        return f"❌ Error calling Claude API: {e}"
 
 
 def run_command_with_ai_analysis(command_args):
@@ -26,7 +69,7 @@ def run_command_with_ai_analysis(command_args):
                 print(result.stderr, end='', file=sys.stderr)
             return result.returncode
         
-        # Command failed - show error and provide AI analysis placeholder
+        # Command failed - show error and provide AI analysis
         print(f"Command failed with exit code {result.returncode}")
         if result.stdout:
             print("STDOUT:")
@@ -35,8 +78,9 @@ def run_command_with_ai_analysis(command_args):
             print("STDERR:")
             print(result.stderr)
         
-        print("\n🤖 AI Analysis (placeholder - not yet implemented):")
-        print("The command failed. Here's where AI would analyze the error and provide suggestions.")
+        print("\n🤖 AI Analysis:")
+        analysis = analyze_error_with_claude(command_args, result.stdout, result.stderr, result.returncode)
+        print(analysis)
         
         return result.returncode
         
