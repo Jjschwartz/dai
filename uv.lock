@@ -54,6 +54,9 @@ dependencies = [
 [package.metadata]
 requires-dist = [{ name = "anthropic", specifier = ">=0.52" }]
 
+[package.metadata.requires-dev]
+dev = []
+
 [[package]]
 name = "certifi"
 version = "2025.4.26"
