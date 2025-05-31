@@ -1,12 +1,13 @@
-#!/usr/bin/env python3
 """
 Command AI (cai) - CLI tool for AI-powered error analysis
 """
 
-import sys
-import subprocess
 import argparse
 import os
+import select
+import subprocess
+import sys
+
 from anthropic import Anthropic
 
 
@@ -37,17 +38,13 @@ Please analyze this error and provide:
 
 Keep your response concise and practical."""
 
-        stream = client.messages.create(
+        response_text = ""
+        with client.messages.stream(
             model="claude-sonnet-4-20250514",
             max_tokens=1000,
             messages=[{"role": "user", "content": prompt}],
-            stream=True,
-        )
-
-        response_text = ""
-        for chunk in stream:
-            if chunk.type == "content_block_delta" and chunk.delta.type == "text":
-                text = chunk.delta.text
+        ) as stream:
+            for text in stream.text_stream:
                 print(text, end="", flush=True)
                 response_text += text
 
@@ -76,7 +73,6 @@ def run_command_with_ai_analysis(command_args):
         stderr_lines = []
 
         # Stream output in real-time
-        import select
 
         # Use polling to read from both stdout and stderr
         while process.poll() is None:
@@ -123,9 +119,7 @@ def run_command_with_ai_analysis(command_args):
             command_args, stdout_text, stderr_text, exit_code
         )
         print(analysis)
-
         return exit_code
-
     except FileNotFoundError:
         print(f"Error: Command '{command_args[0]}' not found")
         return 127
