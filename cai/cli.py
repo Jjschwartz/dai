@@ -37,13 +37,22 @@ Please analyze this error and provide:
 
 Keep your response concise and practical."""
 
-        response = client.messages.create(
+        stream = client.messages.create(
             model="claude-sonnet-4-20250514",
             max_tokens=1000,
             messages=[{"role": "user", "content": prompt}],
+            stream=True,
         )
 
-        return response.content[0].text
+        response_text = ""
+        for chunk in stream:
+            if chunk.type == "content_block_delta" and chunk.delta.type == "text":
+                text = chunk.delta.text
+                print(text, end="", flush=True)
+                response_text += text
+
+        print()  # Add newline after streaming
+        return response_text
 
     except Exception as e:
         return f"❌ Error calling Claude API: {e}"
