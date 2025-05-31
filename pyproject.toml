@@ -16,7 +16,9 @@ build-backend = "hatchling.build"
 package = true
 
 [dependency-groups]
-dev = []
+dev = [
+    "ruff",
+]
 
 [project.scripts]
 cai = "cai.cli:main"
