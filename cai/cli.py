@@ -2,6 +2,7 @@
 """
 Command AI (cai) - CLI tool for AI-powered error analysis
 """
+
 import sys
 import subprocess
 import argparse
@@ -20,14 +21,14 @@ def analyze_error_with_claude(command, stdout, stderr, exit_code):
         client = Anthropic(api_key=api_key)
 
         prompt = f"""I ran this command and it failed:
-Command: {' '.join(command)}
+Command: {" ".join(command)}
 Exit code: {exit_code}
 
 STDOUT:
-{stdout or '(empty)'}
+{stdout or "(empty)"}
 
 STDERR:
-{stderr or '(empty)'}
+{stderr or "(empty)"}
 
 Please analyze this error and provide:
 1. A brief explanation of what went wrong

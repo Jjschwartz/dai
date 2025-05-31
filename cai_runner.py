@@ -2,6 +2,7 @@
 """
 Simple runner script for cai CLI when pip install is not available
 """
+
 import sys
 import os
 
