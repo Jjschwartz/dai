@@ -2,17 +2,15 @@
 Command AI (cai) - CLI tool for AI-powered error analysis
 """
 
-import argparse
 import os
 import select
-import shlex
 import subprocess
 import sys
 
 from anthropic import Anthropic
+from rich.console import Console
 from rich.live import Live
 from rich.markdown import Markdown
-from rich.console import Console
 
 
 def analyze_error_with_claude(command, stdout, stderr, exit_code):
@@ -44,7 +42,7 @@ Format your response using markdown with **bold** for key points and *italics* f
 
         response_text = ""
         console = Console()
-        
+
         with Live(Markdown(""), console=console, refresh_per_second=10) as live:
             with client.messages.stream(
                 model="claude-sonnet-4-20250514",
@@ -55,7 +53,7 @@ Format your response using markdown with **bold** for key points and *italics* f
                     response_text += text
                     # Update the live display with current markdown
                     live.update(Markdown(response_text))
-        
+
         return response_text
 
     except Exception as e:
@@ -81,7 +79,6 @@ def run_command_with_ai_analysis(command_string):
         stderr_lines = []
 
         # Stream output in real-time
-
         # Use polling to read from both stdout and stderr
         while process.poll() is None:
             # Check if there's data to read
@@ -112,7 +109,6 @@ def run_command_with_ai_analysis(command_string):
 
         # Get the exit code
         exit_code = process.returncode
-
         # If command succeeded, we're done
         if exit_code == 0:
             return exit_code
@@ -126,7 +122,7 @@ def run_command_with_ai_analysis(command_string):
         analyze_error_with_claude([command_string], stdout_text, stderr_text, exit_code)
         return exit_code
     except FileNotFoundError:
-        print(f"Error: Command not found")
+        print("Error: Command not found")
         return 127
     except Exception as e:
         print(f"Error executing command: {e}")
@@ -135,27 +131,13 @@ def run_command_with_ai_analysis(command_string):
 
 def main():
     """Main entry point for the cai CLI tool."""
-    parser = argparse.ArgumentParser(
-        description="Command AI - Run commands with AI-powered error analysis",
-        prog="cai",
-    )
-    parser.add_argument("command", nargs="*", help="Command and arguments to execute")
-
-    # If no arguments provided, show help
-    if len(sys.argv) == 1:
-        parser.print_help()
+    args = sys.argv[1:]
+    if not args:
+        print("Usage: cai <command>")
         return 0
 
-    args = parser.parse_args()
-    
     # Join all arguments back into a single command string to preserve quotes, pipes, etc.
-    command_string = " ".join(args.command)
-    
-    # If the command string is empty after joining, show help
-    if not command_string.strip():
-        parser.print_help()
-        return 0
-
+    command_string = " ".join(args)
     # Run the command with AI analysis
     return run_command_with_ai_analysis(command_string)
 
