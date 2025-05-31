@@ -1,4 +1,4 @@
-# debugai
+# dai
 
 **Debug AI** - A simple CLI tool that can be invoked in front of any of your normal terminal commands. When your program encounters an error, debugai will automatically prompt an AI (Claude, GPT) with the error details and provide useful debugging information. Otherwise it will just run the command as normal.
 
@@ -6,7 +6,7 @@
 
 ### Install as CLI tool
 
-To install `debugai` as a global CLI tool using uv:
+To install `dai` as a global CLI tool using uv:
 
 ```bash
 uv tool install .
@@ -51,7 +51,7 @@ dai "python -c 'print(1/0)'"
 dai which python && python --version && dai python main.py
 ```
 
-When the command fails, debugai will capture the error and provide intelligent debugging suggestions using Claude.
+When the command fails, dai will capture the error and provide intelligent debugging suggestions using Claude.
 
 ## Setup
 

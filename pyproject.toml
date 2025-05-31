@@ -1,5 +1,5 @@
 [project]
-name = "debugai"
+name = "dai"
 version = "0.1.0"
 description = "Debug AI - A CLI tool that provides AI-powered error analysis for terminal commands"
 readme = "README.md"
@@ -22,4 +22,4 @@ dev = [
 ]
 
 [project.scripts]
-dai = "debugai:main"
+dai = "dai:main"
