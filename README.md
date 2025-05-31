@@ -4,6 +4,17 @@
 
 ## Installation
 
+### Install as CLI tool
+
+To install `cai` as a global CLI tool using uv:
+
+```bash
+uv tool install .
+```
+
+
+### Development setup
+
 This project uses `uv` for managing installation and dependencies.
 
 ```bash
