@@ -1,7 +1,7 @@
 [project]
-name = "cai"
+name = "debugai"
 version = "0.1.0"
-description = "Command AI - A CLI tool that provides AI-powered error analysis for terminal commands"
+description = "Debug AI - A CLI tool that provides AI-powered error analysis for terminal commands"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -22,4 +22,4 @@ dev = [
 ]
 
 [project.scripts]
-cai = "cai:main"
+dai = "debugai:main"

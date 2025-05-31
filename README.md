@@ -1,12 +1,12 @@
-# cai
+# debugai
 
-**Command AI** - A simple CLI tool that can be invoked in front of any of your normal terminal commands. When your program encounters an error, cai will automatically prompt an AI (Claude, GPT) with the error details and provide useful debugging information. Otherwise it will just run the command as normal.
+**Debug AI** - A simple CLI tool that can be invoked in front of any of your normal terminal commands. When your program encounters an error, debugai will automatically prompt an AI (Claude, GPT) with the error details and provide useful debugging information. Otherwise it will just run the command as normal.
 
 ## Installation
 
 ### Install as CLI tool
 
-To install `cai` as a global CLI tool using uv:
+To install `debugai` as a global CLI tool using uv:
 
 ```bash
 uv tool install .
@@ -26,32 +26,32 @@ uv sync --dev
 
 ## Usage
 
-Simply prefix any command with `cai` to get AI-powered error analysis:
+Simply prefix any command with `dai` to get AI-powered error analysis:
 
 ```bash
-cai your normal command here
+dai your normal command here
 ```
 
 For example:
 
 ```bash
-cai git status
-cai python my_program.py
+dai git status
+dai python my_program.py
 # you can even do, but things get weird
-cai cai python my_program.py
+dai dai python my_program.py
 ```
 
 Normal shell syntax is supported, including pipes, redirects, and complex commands by using quotes.
 
 ```bash
-cai "git status | grep 'modified'"
-cai "python -c 'print(1/0)'"
+dai "git status | grep 'modified'"
+dai "python -c 'print(1/0)'"
 # without quotes things work as normal, with each command separate
-# e.g. cai will only run for the first and third command
-cai which python && python --version && cai python main.py
+# e.g. dai will only run for the first and third command
+dai which python && python --version && dai python main.py
 ```
 
-When the command fails, cai will capture the error and provide intelligent debugging suggestions using Claude.
+When the command fails, debugai will capture the error and provide intelligent debugging suggestions using Claude.
 
 ## Setup
 
