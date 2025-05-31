@@ -115,10 +115,7 @@ def run_command_with_ai_analysis(command_args):
 
         print(f"\nCommand failed with exit code {exit_code}")
         print("\n🤖 AI Analysis:")
-        analysis = analyze_error_with_claude(
-            command_args, stdout_text, stderr_text, exit_code
-        )
-        print(analysis)
+        analyze_error_with_claude(command_args, stdout_text, stderr_text, exit_code)
         return exit_code
     except FileNotFoundError:
         print(f"Error: Command '{command_args[0]}' not found")

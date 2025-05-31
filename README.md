@@ -10,6 +10,8 @@ To install `cai` as a global CLI tool using uv:
 
 ```bash
 uv tool install .
+# or to reinstall
+uv tool install --force .
 ```
 
 
@@ -19,6 +21,8 @@ This project uses `uv` for managing installation and dependencies.
 
 ```bash
 uv sync
+# for development
+uv sync --dev
 ```
 
 ## Usage
