@@ -4,6 +4,14 @@
 
 ## Installation
 
+First clone the repo:
+
+```bash
+# e.g. using https
+git clone https://github.com/Jjschwartz/dai.git
+cd dai
+```
+
 ### Install as CLI tool
 
 To install `dai` as a global CLI tool using uv:
@@ -14,13 +22,15 @@ uv tool install .
 uv tool install --force .
 ```
 
+This will install `dai` as a tool globally for the current user. You may need to create a new terminal session for the tool to be available.
+
 ### Development setup
 
 This project uses `uv` for managing installation and dependencies.
 
 ```bash
 uv sync
-# for development
+# for development (installs additionaldev dependencies)
 uv sync --dev
 ```
 
@@ -37,7 +47,7 @@ For example:
 ```bash
 dai git status
 dai python my_program.py
-# you can even do, but things get weird
+# you can even do the following (but things get weird)
 dai dai python my_program.py
 ```
 
