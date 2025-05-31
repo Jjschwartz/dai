@@ -9,6 +9,9 @@ import subprocess
 import sys
 
 from anthropic import Anthropic
+from rich.live import Live
+from rich.markdown import Markdown
+from rich.console import Console
 
 
 def analyze_error_with_claude(command, stdout, stderr, exit_code):
@@ -36,19 +39,22 @@ Please analyze this error and provide:
 2. Specific suggestions to fix the issue
 3. Any relevant context or common causes
 
-Keep your response concise and practical."""
+Format your response using markdown with **bold** for key points and *italics* for emphasis. Keep your response concise and practical."""
 
         response_text = ""
-        with client.messages.stream(
-            model="claude-sonnet-4-20250514",
-            max_tokens=1000,
-            messages=[{"role": "user", "content": prompt}],
-        ) as stream:
-            for text in stream.text_stream:
-                print(text, end="", flush=True)
-                response_text += text
-
-        print()  # Add newline after streaming
+        console = Console()
+        
+        with Live(Markdown(""), console=console, refresh_per_second=10) as live:
+            with client.messages.stream(
+                model="claude-sonnet-4-20250514",
+                max_tokens=1000,
+                messages=[{"role": "user", "content": prompt}],
+            ) as stream:
+                for text in stream.text_stream:
+                    response_text += text
+                    # Update the live display with current markdown
+                    live.update(Markdown(response_text))
+        
         return response_text
 
     except Exception as e:
