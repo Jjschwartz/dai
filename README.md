@@ -36,7 +36,9 @@ For example:
 
 ```bash
 cai git status
-cai python -c "print('Hello, world!')"
+cai python my_program.py
+# you can even do, but things get weird
+cai cai python my_program.py
 ```
 
 Normal shell syntax is supported, including pipes, redirects, and complex commands by using quotes.
@@ -44,7 +46,7 @@ Normal shell syntax is supported, including pipes, redirects, and complex comman
 ```bash
 cai "git status | grep 'modified'"
 cai "python -c 'print(1/0)'"
-# without quotes things work as normal but separate commands
+# without quotes things work as normal, with each command separate
 # e.g. cai will only run for the first and third command
 cai which python && python --version && cai python main.py
 ```
