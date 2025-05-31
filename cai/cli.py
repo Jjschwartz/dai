@@ -4,6 +4,7 @@ Command AI (cai) - CLI tool for AI-powered error analysis
 
 import os
 import select
+import shlex
 import subprocess
 import sys
 
@@ -13,18 +14,22 @@ from rich.live import Live
 from rich.markdown import Markdown
 
 
-def analyze_error_with_claude(command, stdout, stderr, exit_code):
+def analyze_error_with_claude(command: str, stdout: str, stderr: str, exit_code: int):
     """Use Claude to analyze the command error and provide suggestions."""
+    print("\n🤖 AI Analysis:")
     try:
         # Check for API key
         api_key = os.getenv("ANTHROPIC_API_KEY")
         if not api_key:
-            return "❌ No ANTHROPIC_API_KEY environment variable found. Please set it to use AI analysis."
+            print(
+                "❌ No ANTHROPIC_API_KEY environment variable found. Please set it to use AI analysis."
+            )
+            return
 
         client = Anthropic(api_key=api_key)
 
         prompt = f"""I ran this command and it failed:
-Command: {" ".join(command)}
+Command: {command}
 Exit code: {exit_code}
 
 STDOUT:
@@ -97,8 +102,8 @@ def run_command_with_ai_analysis(command_string):
                         stderr_lines.append(line)
 
         # Read any remaining output
-        remaining_stdout = process.stdout.read()
-        remaining_stderr = process.stderr.read()
+        remaining_stdout = process.stdout.read()  # type: ignore
+        remaining_stderr = process.stderr.read()  # type: ignore
 
         if remaining_stdout:
             print(remaining_stdout, end="")
@@ -118,8 +123,7 @@ def run_command_with_ai_analysis(command_string):
         stderr_text = "".join(stderr_lines)
 
         print(f"\nCommand failed with exit code {exit_code}")
-        print("\n🤖 AI Analysis:")
-        analyze_error_with_claude([command_string], stdout_text, stderr_text, exit_code)
+        analyze_error_with_claude(command_string, stdout_text, stderr_text, exit_code)
         return exit_code
     except FileNotFoundError:
         print("Error: Command not found")
@@ -137,10 +141,6 @@ def main():
         return 0
 
     # Join all arguments back into a single command string to preserve quotes, pipes, etc.
-    command_string = " ".join(args)
+    command_string = shlex.join(args)
     # Run the command with AI analysis
     return run_command_with_ai_analysis(command_string)
-
-
-if __name__ == "__main__":
-    sys.exit(main())
